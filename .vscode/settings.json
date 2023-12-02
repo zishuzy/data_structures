@@ -1,0 +1,9 @@
+{
+    "files.associations": {
+        "makefile_materials": "makefile",
+        "*.gtpl": "html",
+        "deque": "cpp",
+        "string": "cpp",
+        "vector": "cpp"
+    }
+}

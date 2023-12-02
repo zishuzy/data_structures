@@ -1,0 +1,32 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "cmake",
+            "type": "shell",
+            "command": "/usr/bin/cmake",
+            "args": [".."],
+            "options": {
+                "cwd": "${workspaceFolder}/build",
+            },
+            "problemMatcher": [],
+            "group": "build"
+        },
+        {
+            "label": "make",
+            "type": "shell",
+            "command": "/usr/bin/make",
+            "args": [
+                "-j8"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/build",
+            },
+            "problemMatcher": [],
+            "group": "build",
+            "dependsOn": [
+                "cmake"
+            ]
+        }
+    ]
+}
