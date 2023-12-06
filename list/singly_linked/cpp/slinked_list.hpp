@@ -38,7 +38,7 @@ public:
         , tail_(nullptr)
     {
     }
-    ~SlinkedList() {}
+    ~SlinkedList() { destroy(); }
 
     bool InsertSart(T &&data);
     bool InsertSart(const T &data);
@@ -59,7 +59,10 @@ public:
 
     Node<T> *Remove(Node<T> *node);
 
-    void ForwardTraverse(std::function<int(Node<T> *node)> cb);
+    void ForwardTraverse(std::function<int(Node<T> *node, void *ctx)> cb, void *ctx);
+
+private:
+    void destroy();
 
 private:
     uint32_t size_;
@@ -165,6 +168,7 @@ bool SlinkedList<T>::InsertNodeBefore(Node<T> *next, Node<T> *node)
         prev->next = node;
     }
     size_++;
+    return true;
 }
 
 template <typename T>
@@ -245,18 +249,19 @@ bool SlinkedList<T>::MoveEnd(Node<T> *node)
 
     if (head_ == node) {
         head_ = node->next;
+
     } else {
         prev = FindPrev(node);
         if (prev == nullptr) {
             LOG_ERROR("Can't find the node in the singly-linked list!");
             return false;
         }
-
         prev->next = node->next;
-        tail_->next = node;
-        tail_ = node;
-        node->next = nullptr;
     }
+
+    tail_->next = node;
+    tail_ = node;
+    node->next = nullptr;
 
     return true;
 }
@@ -289,17 +294,32 @@ Node<T> *SlinkedList<T>::Remove(Node<T> *node)
 }
 
 template <typename T>
-void SlinkedList<T>::ForwardTraverse(std::function<int(Node<T> *node)> cb)
+void SlinkedList<T>::ForwardTraverse(std::function<int(Node<T> *node, void *ctx)> cb, void *ctx)
 {
 
     Node<T> *node = head_;
     while (node) {
-        if (cb(node) == 1) {
+        if (cb(node, ctx) == 1) {
             break;
         }
         node = node->next;
     }
 }
+
+template <typename T>
+void SlinkedList<T>::destroy()
+{
+    Node<T> *node, *node_head;
+    if (head_ == nullptr) {
+        return;
+    }
+
+    for (node = head_; node != NULL; node = node_head) {
+        node_head = node->next;
+        delete node;
+    }
+}
+
 } // namespace singly_linked
 } // namespace llist
 
