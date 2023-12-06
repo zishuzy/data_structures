@@ -11,5 +11,5 @@ include_directories(${PROJECT_SOURCE_DIR}
     ${PROJECT_SOURCE_DIR}/..
 )
 
+add_subdirectory(doubly_linked)
 add_subdirectory(single)
-add_subdirectory(double)

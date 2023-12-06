@@ -1,12 +1,12 @@
-#include "double_list.h"
+#include "dlinked_list.h"
 
 #include "common/log/log.h"
 
 #include <stdlib.h>
 
-struct dlist_head *create_dlist()
+struct dlinked_list_head *dlist_create()
 {
-    struct dlist_head *head = malloc(sizeof(struct dlist_head));
+    struct dlinked_list_head *head = malloc(sizeof(struct dlinked_list_head));
     if (!head) {
         return head;
     }
@@ -18,13 +18,14 @@ struct dlist_head *create_dlist()
     return head;
 }
 
-void free_dlist(struct dlist_head *head, void (*cb)(struct dlist_node *node, void *ctx), void *ctx)
+void dlist_free(struct dlinked_list_head *head,
+                void (*cb)(struct dlinked_list_node *node, void *ctx), void *ctx)
 {
     if (!head) {
         return;
     }
 
-    struct dlist_node *node, *node_head;
+    struct dlinked_list_node *node, *node_head;
     for (node = head->first; node != NULL; node = node_head) {
         if (cb) {
             cb(node, ctx);
@@ -35,9 +36,9 @@ void free_dlist(struct dlist_head *head, void (*cb)(struct dlist_node *node, voi
     free(head);
 }
 
-struct dlist_node *create_dlist_node(void *data)
+struct dlinked_list_node *dlist_node_create(void *data)
 {
-    struct dlist_node *node = malloc(sizeof(struct dlist_node));
+    struct dlinked_list_node *node = malloc(sizeof(struct dlinked_list_node));
     if (!node) {
         return node;
     }
@@ -48,7 +49,7 @@ struct dlist_node *create_dlist_node(void *data)
     return node;
 }
 
-void free_dlist_node(struct dlist_node *node)
+void dlist_node_free(struct dlinked_list_node *node)
 {
     if (!node) {
         return;
@@ -56,7 +57,7 @@ void free_dlist_node(struct dlist_node *node)
     free(node);
 }
 
-int insert_node_start(struct dlist_head *head, struct dlist_node *node)
+int dlist_insert_node_start(struct dlinked_list_head *head, struct dlinked_list_node *node)
 {
     if (!head || !node) {
         return -1;
@@ -78,7 +79,7 @@ int insert_node_start(struct dlist_head *head, struct dlist_node *node)
     return 0;
 }
 
-int insert_node_end(struct dlist_head *head, struct dlist_node *node)
+int dlist_insert_node_end(struct dlinked_list_head *head, struct dlinked_list_node *node)
 {
     if (!head || !node) {
         return -1;
@@ -99,60 +100,53 @@ int insert_node_end(struct dlist_head *head, struct dlist_node *node)
     return 0;
 }
 
-int insert_node_before(struct dlist_head *head, struct dlist_node *pos_node,
-                       struct dlist_node *node)
+int dlist_insert_node_before(struct dlinked_list_head *head, struct dlinked_list_node *pos_node,
+                             struct dlinked_list_node *node)
 {
     if (!head || !pos_node || !node) {
         return -1;
     }
 
-    if (pos_node->prev) {
+    if (head->first == pos_node) {
+        head->first = node;
+        node->prev = NULL;
+        node->next = pos_node;
+        pos_node->prev = node;
+    } else {
+        // If the pos_node isnot the first node, then pos_node->prev isnot NULL.
         pos_node->prev->next = node;
         node->prev = pos_node->prev;
         pos_node->prev = node;
         node->next = pos_node;
-    } else {
-        if (head->first == pos_node) {
-            head->first = node;
-            pos_node->prev = node;
-            node->next = pos_node;
-            node->prev = NULL;
-        } else {
-            LOG_ERROR("BUG: head->first != pos_node");
-            return -1;
-        }
     }
     head->size++;
     return 0;
 }
 
-int insert_node_after(struct dlist_head *head, struct dlist_node *pos_node, struct dlist_node *node)
+int dlist_insert_node_after(struct dlinked_list_head *head, struct dlinked_list_node *pos_node,
+                            struct dlinked_list_node *node)
 {
     if (!head || !pos_node || !node) {
         return -1;
     }
 
-    if (pos_node->next) {
+    if (head->last == pos_node) {
+        head->last = node;
+        node->next = NULL;
+        node->prev = pos_node;
+        pos_node->next = node;
+    } else {
+        // If the pos_node isnot the last node, then pos_node->next isnot NULL.
         pos_node->next->prev = node;
         node->next = pos_node->next;
         pos_node->next = node;
         node->prev = pos_node;
-    } else {
-        if (head->last == pos_node) {
-            head->last = node;
-            pos_node->next = node;
-            node->prev = pos_node;
-            node->next = NULL;
-        } else {
-            LOG_ERROR("BUG: head->last != prev");
-            return -1;
-        }
     }
     head->size++;
     return 0;
 }
 
-int move_node_start(struct dlist_head *head, struct dlist_node *node)
+int dlist_move_node_start(struct dlinked_list_head *head, struct dlinked_list_node *node)
 {
     if (!head || !head->first || !node) {
         return -1;
@@ -181,7 +175,7 @@ int move_node_start(struct dlist_head *head, struct dlist_node *node)
     return 0;
 }
 
-int move_node_end(struct dlist_head *head, struct dlist_node *node)
+int dlist_move_node_end(struct dlinked_list_head *head, struct dlinked_list_node *node)
 {
     if (!head || !head->last || !node) {
         return -1;
@@ -210,7 +204,8 @@ int move_node_end(struct dlist_head *head, struct dlist_node *node)
     return 0;
 }
 
-struct dlist_node *remove_node(struct dlist_head *head, struct dlist_node *node)
+struct dlinked_list_node *dlist_remove_node(struct dlinked_list_head *head,
+                                            struct dlinked_list_node *node)
 {
     if (!head || !node) {
         return NULL;
@@ -234,13 +229,13 @@ struct dlist_node *remove_node(struct dlist_head *head, struct dlist_node *node)
     return node;
 }
 
-void walk_dlist_forward(struct dlist_head *head, int (*cb)(struct dlist_node *node, void *ctx),
-                        void *ctx)
+void dlist_forward_traverse(struct dlinked_list_head *head,
+                            int (*cb)(struct dlinked_list_node *node, void *ctx), void *ctx)
 {
     if (!head) {
         return;
     }
-    struct dlist_node *node = head->first;
+    struct dlinked_list_node *node = head->first;
 
     while (node) {
         if (cb(node, ctx) == 1) {
@@ -250,13 +245,13 @@ void walk_dlist_forward(struct dlist_head *head, int (*cb)(struct dlist_node *no
     }
 }
 
-void walk_dlist_reverse(struct dlist_head *head, int (*cb)(struct dlist_node *node, void *ctx),
-                        void *ctx)
+void dlist_reverse_traverse(struct dlinked_list_head *head,
+                            int (*cb)(struct dlinked_list_node *node, void *ctx), void *ctx)
 {
     if (!head) {
         return;
     }
-    struct dlist_node *node = head->last;
+    struct dlinked_list_node *node = head->last;
 
     while (node) {
         if (cb(node, ctx) == 1) {
