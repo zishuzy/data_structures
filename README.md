@@ -1,6 +1,18 @@
 # data_structures
 
-数据结构学习和测试
+The project contains implementions of commonly used data structures.
+
+## Code tree
+
+```shell
+.
+├── common
+├── list
+│   ├── doubly_linked
+│   └── singly_linked
+├── queue
+└── tree
+```
 
 ## 平衡二叉树
 
