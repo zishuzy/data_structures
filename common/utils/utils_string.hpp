@@ -1,3 +1,13 @@
+/**
+ * @file utils_string.hpp
+ * @author zishu (zishuzy@gmail.com)
+ * @brief Utilities for string
+ * @version 0.1
+ * @date 2023-12-07
+ *
+ * @copyright Copyright (c) 2023
+ *
+ */
 #ifndef UTILS_UTILS_STRING
 #define UTILS_UTILS_STRING
 

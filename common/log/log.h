@@ -1,3 +1,13 @@
+/**
+ * @file log.h
+ * @author zishu (zishuzy@gmail.com)
+ * @brief Simple logger
+ * @version 0.1
+ * @date 2023-12-07
+ *
+ * @copyright Copyright (c) 2023
+ *
+ */
 #ifndef LOG_LOG
 #define LOG_LOG
 
