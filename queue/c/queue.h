@@ -46,14 +46,14 @@ void queue_free(queue_t *q, void (*cb)(queue_node_t *node, void *ctx), void *ctx
  * @param data
  * @return queue_node_t*
  */
-queue_node_t *queue_create_node(void *data);
+queue_node_t *queue_node_create(void *data);
 
 /**
  * @brief Free the node of queue.
  *
  * @param node
  */
-void queue_free_node(queue_node_t *node);
+void queue_node_free(queue_node_t *node);
 
 /**
  * @brief Enqueue the node into the queue.

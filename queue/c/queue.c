@@ -44,7 +44,7 @@ void queue_free(queue_t *q, void (*cb)(queue_node_t *node, void *ctx), void *ctx
     free(q);
 }
 
-queue_node_t *queue_create_node(void *data)
+queue_node_t *queue_node_create(void *data)
 {
     queue_node_t *node = malloc(sizeof(queue_node_t));
     if (!node) {
@@ -57,7 +57,7 @@ queue_node_t *queue_create_node(void *data)
     return node;
 }
 
-void queue_free_node(queue_node_t *node)
+void queue_node_free(queue_node_t *node)
 {
     if (!node) {
         return;
