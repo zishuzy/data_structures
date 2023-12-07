@@ -12,5 +12,4 @@ include_directories(${PROJECT_SOURCE_DIR}
     ${PROJECT_SOURCE_DIR}/../..
 )
 
-add_executable(queue queue_c.c queue_test.c)
-target_link_libraries(queue pthread)
+add_subdirectory(c)
