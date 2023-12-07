@@ -1,3 +1,13 @@
+/**
+ * @file dlinked_list.c
+ * @author zishu (zishuzy@gmail.com)
+ * @brief Doubly-linked list using C.
+ * @version 0.1
+ * @date 2023-12-07
+ *
+ * @copyright Copyright (c) 2023
+ *
+ */
 #include "dlinked_list.h"
 
 #include "common/log/log.h"

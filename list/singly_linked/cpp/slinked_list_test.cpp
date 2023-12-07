@@ -1,3 +1,13 @@
+/**
+ * @file slinked_list_test.cpp
+ * @author zishu (zishuzy@gmail.com)
+ * @brief Test singly-linked list using C++.
+ * @version 0.1
+ * @date 2023-12-07
+ * 
+ * @copyright Copyright (c) 2023
+ * 
+ */
 #include "slinked_list.hpp"
 #include "common/utils/utils_string.hpp"
 

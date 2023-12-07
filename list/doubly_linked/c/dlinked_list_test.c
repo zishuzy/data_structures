@@ -1,3 +1,13 @@
+/**
+ * @file dlinked_list_test.c
+ * @author zishu (zishuzy@gmail.com)
+ * @brief Test the doubly-linked list using C.
+ * @version 0.1
+ * @date 2023-12-07
+ *
+ * @copyright Copyright (c) 2023
+ *
+ */
 #include "common/log/log.h"
 
 #include "dlinked_list.h"

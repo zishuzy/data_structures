@@ -1,3 +1,13 @@
+/**
+ * @file slinked_list.c
+ * @author zishu (zishuzy@gmail.com)
+ * @brief Singly-linked list using C.
+ * @version 0.1
+ * @date 2023-12-07
+ *
+ * @copyright Copyright (c) 2023
+ *
+ */
 #include "slinked_list.h"
 
 #include "common/log/log.h"

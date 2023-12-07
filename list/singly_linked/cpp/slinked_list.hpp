@@ -1,3 +1,13 @@
+/**
+ * @file slinked_list.hpp
+ * @author zishu (zishuzy@gmail.com)
+ * @brief Singly-linked list using C++.
+ * @version 0.1
+ * @date 2023-12-07
+ * 
+ * @copyright Copyright (c) 2023
+ * 
+ */
 #ifndef CPP_DLINKED_LIST
 #define CPP_DLINKED_LIST
 
