@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(tree)
+project(binary_search_tree)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include_directories(${PROJECT_SOURCE_DIR}
     ${PROJECT_SOURCE_DIR}/..
+    ${PROJECT_SOURCE_DIR}/../..
 )
 
-add_subdirectory(binary_tree)
-add_subdirectory(binary_search_tree)
+add_subdirectory(c)
