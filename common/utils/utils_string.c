@@ -29,7 +29,7 @@ void split_string(char *str, char delim, int (*cb)(const char *data, void *ctx),
             b = p + 1;
         }
     }
-    if (abort && *b != '\0') {
+    if (!abort && *b != '\0') {
         cb(b, ctx);
     }
 }
