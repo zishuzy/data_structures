@@ -43,7 +43,7 @@ static void btree_print_helper(btree_node_t *node, int depth, int *arr_flag,
     btree_print_helper(node->left, depth + 1, arr_flag, cb_print);
 }
 
-btree_node_t *btree_node_create(void *data)
+btree_node_t *btree_node_create(void *data, uint32_t len)
 {
     btree_node_t *node = malloc(sizeof(btree_node_t));
     if (!node) {
@@ -51,6 +51,7 @@ btree_node_t *btree_node_create(void *data)
     }
 
     node->data = data;
+    node->len = len;
     node->left = NULL;
     node->right = NULL;
 

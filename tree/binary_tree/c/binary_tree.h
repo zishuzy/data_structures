@@ -17,6 +17,7 @@ typedef struct btree_node {
     struct btree_node *left;
     struct btree_node *right;
     void *data;
+    uint32_t len;
 } btree_node_t;
 
 /**
@@ -25,7 +26,7 @@ typedef struct btree_node {
  * @param data
  * @return btree_node_t*
  */
-btree_node_t *btree_node_create(void *data);
+btree_node_t *btree_node_create(void *data, uint32_t len);
 
 /**
  * @brief Free the node of a binary tree.

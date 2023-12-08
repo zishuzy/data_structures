@@ -32,7 +32,7 @@ int walk_str(const char *str, void *ctx)
     LOG_INFO("get str: %s", str);
     if (strcmp(str, "null")) {
         data = atol(str);
-        btnode = btree_node_create((void *)data);
+        btnode = btree_node_create((void *)data, 0);
         if (!btnode) {
             goto err1;
         }
