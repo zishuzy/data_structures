@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(test_data_structures)
+project(data_structures)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -14,5 +14,6 @@ include_directories(${PROJECT_SOURCE_DIR})
 
 add_compile_options(-Wall -Wextra)
 
-add_subdirectory(tree)
+add_subdirectory(list)
 add_subdirectory(queue)
+add_subdirectory(tree)

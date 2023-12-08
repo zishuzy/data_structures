@@ -11,22 +11,96 @@
 #ifndef C_BINARY_TREE
 #define C_BINARY_TREE
 
+#include <stdint.h>
+
 typedef struct btree_node {
     struct btree_node *left;
     struct btree_node *right;
     void *data;
 } btree_node_t;
 
+/**
+ * @brief Create a node for a binary tree.
+ *
+ * @param data
+ * @return btree_node_t*
+ */
 btree_node_t *btree_node_create(void *data);
 
+/**
+ * @brief Free the node of a binary tree.
+ *
+ * @param node
+ */
 void btree_node_free(btree_node_t *node);
 
-void btree_preorder(btree_node_t *node, int (*cb)(btree_node_t *node, void *ctx), void *ctx);
+/**
+ * @brief Destroy the binary tree.
+ *
+ * @param root
+ */
+void btree_destroy(btree_node_t *root);
 
-void btree_inorder(btree_node_t *node, int (*cb)(btree_node_t *node, void *ctx), void *ctx);
+/**
+ * @brief Get the depth for the binary tree.
+ *
+ * @param root
+ * @return uint32_t
+ */
+uint32_t btree_depth(btree_node_t *root);
 
-void btree_postorder(btree_node_t *node, int (*cb)(btree_node_t *node, void *ctx), void *ctx);
+/**
+ * @brief Preorder traverse the binary tree.
+ *
+ * @param root
+ * @param cb
+ * @param ctx
+ */
+void btree_preorder(btree_node_t *root, int (*cb)(btree_node_t *node, void *ctx), void *ctx);
 
-void btree_levelorder(btree_node_t *node, int (*cb)(btree_node_t *node, void *ctx), void *ctx);
+/**
+ * @brief Inorder traverse the binary tree.
+ *
+ * @param root
+ * @param cb
+ * @param ctx
+ */
+void btree_inorder(btree_node_t *root, int (*cb)(btree_node_t *node, void *ctx), void *ctx);
+
+/**
+ * @brief Postorder traverse the binary tree.
+ *
+ * @param root
+ * @param cb
+ * @param ctx
+ */
+void btree_postorder(btree_node_t *root, int (*cb)(btree_node_t *node, void *ctx), void *ctx);
+
+/**
+ * @brief Levelorder traverse the binary tree.
+ *
+ * @param root
+ * @param cb
+ * @param ctx
+ */
+void btree_levelorder(btree_node_t *root, int (*cb)(btree_node_t *node, void *ctx), void *ctx);
+
+/**
+ * @brief Levelorder traverse the binary tree, including the depth info.
+ *
+ * @param root
+ * @param cb
+ * @param ctx
+ */
+void btree_levelorder2(btree_node_t *root, int (*cb)(btree_node_t *node, int depth, void *ctx),
+                       void *ctx);
+
+/**
+ * @brief Print the binary tree.
+ *
+ * @param root
+ * @param cb_print
+ */
+void btree_print(btree_node_t *root, void (*cb_print)(void *data));
 
 #endif /* C_BINARY_TREE */
