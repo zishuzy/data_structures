@@ -9,6 +9,9 @@
  *
  */
 #include <stdlib.h>
+#include <stdio.h>
+#include <time.h>
+
 #include "common/log/log.h"
 #include "common/utils/utils_string.h"
 
@@ -16,115 +19,54 @@
 
 #include "bs_tree.h"
 
-struct bstree_ctx {
-    bstree_node_t *root;
-    queue_t *q;
-};
-
-int walk_str(const char *str, void *ctx)
+void print_node_data(void *key, uint32_t key_len, void *val, uint32_t val_len)
 {
-    static int flag = 0;
-    struct bstree_ctx *btctx = ctx;
-    queue_node_t *qnode;
-    bstree_node_t *btnode = NULL;
-    long data;
-
-    LOG_INFO("get str: %s", str);
-    if (strcmp(str, "null")) {
-        data = atol(str);
-        btnode = bstree_node_create((void *)data);
-        if (!btnode) {
-            goto err1;
-        }
-    }
-
-    if (!btctx->root) {
-        btctx->root = btnode;
-    } else {
-        if (!flag) {
-            qnode = queue_front(btctx->q);
-            if (btnode) {
-                ((bstree_node_t *)qnode->data)->left = btnode;
-            }
-            flag = 1;
-        } else {
-            qnode = queue_dequeue(btctx->q);
-            if (btnode) {
-                ((bstree_node_t *)qnode->data)->right = btnode;
-            }
-            flag = 0;
-            queue_node_free(qnode);
-        }
-    }
-
-    if (btnode) {
-        qnode = queue_node_create(btnode);
-        if (!qnode) {
-            goto err2;
-        }
-        queue_enqueue(btctx->q, qnode);
-    }
-
-    return 0;
-err2:
-    bstree_node_free(btnode);
-err1:
-    return 1;
+    printf("%ld-%ld", (long)key, (long)val);
 }
 
-int print_bstree_node(bstree_node_t *node, void *ctx)
+int less(bstree_node_t *left, bstree_node_t *right)
 {
-    printf("%ld, ", (long)node->val);
-
-    return 0;
-}
-
-int print_bstree_node2(bstree_node_t *node, int depth, void *ctx)
-{
-    static int s_last_depth = -1;
-
-    if (depth != s_last_depth) {
-        s_last_depth = depth;
-        printf("\ndepth[%d]: ", depth);
-    }
-
-    printf("%ld, ", (long)node->val);
-
-    return 0;
-}
-
-void print_node_data(void *data)
-{
-    printf("%ld", (long)data);
+    return (long)left->key < (long)right->key;
 }
 
 int main(void)
 {
-    char tmp[] = {"1,2,3,4,null,5,null,6,7,8,9,10,11,12,13"};
-    struct bstree_ctx ctx;
+    long i, tmp;
+    bstree_node_t *root = NULL;
+    bstree_node_t *node, *old = NULL;
 
-    ctx.root = NULL;
-    ctx.q = queue_create();
-    if (!ctx.q) {
-        LOG_ERROR("Failed to create queue!");
-        return 1;
+    srand((int)time(NULL));
+    for (i = 0; i < 10; i++) {
+        tmp = rand() % 100;
+        LOG_INFO("Insert val: %ld", tmp);
+
+        if (!root) {
+            root = bstree_node_create((void *)tmp, 0, (void *)tmp, 0);
+        } else {
+            node = bstree_node_create((void *)tmp, 0, (void *)tmp, 0);
+            bstree_insert_node(root, node, less);
+        }
     }
 
-    split_string(tmp, ',', walk_str, &ctx);
+    printf("tree print:\n");
+    bstree_print(root, print_node_data);
 
-    printf("levelorder traverse:\n");
-    bstree_levelorder(ctx.root, print_bstree_node, NULL);
-    printf("\n");
+    node = bstree_node_create(root->key, root->key_len, root->val, root->val_len);
+    bstree_insert_node2(root, node, &old, less);
+    if (old) {
+        LOG_INFO("Found node is exist! old[0x%08lx] data[%ld]", (long)old, (long)old->val);
 
-    printf("levelorder traverse:\n");
-    bstree_levelorder2(ctx.root, print_bstree_node2, NULL);
-    printf("\n");
+        if (old == root) {
+            LOG_INFO("Insert node is root! root[0x%08lx] old[0x%08lx]", (long)root, (long)old);
+            root = node;
+        }
+        bstree_node_free(old, NULL, NULL);
+    }
 
     printf("tree print:\n");
-    bstree_print(ctx.root, print_node_data);
+    bstree_print(root, print_node_data);
 
-    queue_free(ctx.q, NULL, NULL);
-    bstree_destroy(ctx.root);
+    bstree_destroy(root, NULL, NULL);
 
     return 0;
 }

@@ -14,6 +14,7 @@
 #include <stdint.h>
 
 typedef struct bstree_node {
+    struct bstree_node *parent;
     struct bstree_node *left;
     struct bstree_node *right;
     void *key;
@@ -49,20 +50,20 @@ void bstree_destroy(bstree_node_t *root,
                     void (*cb)(void *key, uint32_t key_len, void *val, uint32_t val_len, void *ctx),
                     void *ctx);
 
-// int bstree_insert(bstree_node_t *root, void *key, uint32_t key_len, void *val, uint32_t val_len,
-//                   int (*less)(void *key_left, uint32_t key_left_len, void *key_right,
-//                               uint32_t key_right_len),
-//                   int (*upgrade)(bstree_node_t *old, void *key, uint32_t key_len, void *val,
-//                                  uint32_t val_len, void *ctx),
-//                   void *ctx);
+int bstree_insert(bstree_node_t *root, void *key, uint32_t key_len, void *val, uint32_t val_len,
+                  int (*less)(void *left_key, uint32_t left_key_len, void *right_key,
+                              uint32_t right_key_len));
 
-int bstree_insert_node(bstree_node_t *root, bstree_node_t *node,
-                       int (*less)(bstree_node_t *left, bstree_node_t *right));
+int bstree_insert2(bstree_node_t *root, void *key, uint32_t key_len, void *val, uint32_t val_len,
+                   int (*less)(void *left_key, uint32_t left_key_len, void *right_key,
+                               uint32_t right_key_len),
+                   void (*cb_free)(void *key, uint32_t key_len, void *val, uint32_t val_len,
+                                   void *ctx),
+                   void *ctx);
 
-// int bstree_insert_node2(bstree_node_t *root, bstree_node_t *node,
-//                         int (*less)(bstree_node_t *left, bstree_node_t *right),
-//                         int (*upgrade)(bstree_node_t *old, bstree_node_t *node, void *ctx),
-//                         void *ctx);
+int bstree_is_exists(bstree_node_t *root, void *key, uint32_t key_len,
+                     int (*less)(void *left_key, uint32_t left_key_len, void *right_key,
+                                 uint32_t right_key_len));
 
 /**
  * @brief Get the depth for the binary search tree.
@@ -124,6 +125,7 @@ void bstree_levelorder2(bstree_node_t *root, int (*cb)(bstree_node_t *node, int 
  * @param root
  * @param cb_print
  */
-void bstree_print(bstree_node_t *root, void (*cb_print)(void *data));
+void bstree_print(bstree_node_t *root,
+                  void (*cb_print)(void *key, uint32_t key_len, void *val, uint32_t val_len));
 
 #endif /* C_BS_TREE */
