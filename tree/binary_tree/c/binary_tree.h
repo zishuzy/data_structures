@@ -33,14 +33,15 @@ btree_node_t *btree_node_create(void *data, uint32_t len);
  *
  * @param node
  */
-void btree_node_free(btree_node_t *node);
+void btree_node_free(btree_node_t *node, void (*cb)(void *data, uint32_t len, void *ctx),
+                     void *ctx);
 
 /**
  * @brief Destroy the binary tree.
  *
  * @param root
  */
-void btree_destroy(btree_node_t *root);
+void btree_destroy(btree_node_t *root, void (*cb)(void *data, uint32_t len, void *ctx), void *ctx);
 
 /**
  * @brief Get the depth for the binary tree.

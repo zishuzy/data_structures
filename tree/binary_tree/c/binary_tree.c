@@ -58,22 +58,25 @@ btree_node_t *btree_node_create(void *data, uint32_t len)
     return node;
 }
 
-void btree_node_free(btree_node_t *node)
+void btree_node_free(btree_node_t *node, void (*cb)(void *data, uint32_t len, void *ctx), void *ctx)
 {
     if (!node) {
         return;
     }
+    if (cb) {
+        cb(node->data, node->len, ctx);
+    }
     free(node);
 }
 
-void btree_destroy(btree_node_t *root)
+void btree_destroy(btree_node_t *root, void (*cb)(void *data, uint32_t len, void *ctx), void *ctx)
 {
     if (!root) {
         return;
     }
-    btree_destroy(root->left);
-    btree_destroy(root->right);
-    btree_node_free(root);
+    btree_destroy(root->left, cb, ctx);
+    btree_destroy(root->right, cb, ctx);
+    btree_node_free(root, cb, ctx);
 }
 
 uint32_t btree_depth(btree_node_t *root)

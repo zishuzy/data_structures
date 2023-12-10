@@ -67,7 +67,7 @@ int walk_str(const char *str, void *ctx)
 
     return 0;
 err2:
-    btree_node_free(btnode);
+    btree_node_free(btnode, NULL, NULL);
 err1:
     return 1;
 }
@@ -124,7 +124,7 @@ int main(void)
     btree_print(ctx.root, print_node_data);
 
     queue_free(ctx.q, NULL, NULL);
-    btree_destroy(ctx.root);
+    btree_destroy(ctx.root, NULL, NULL);
 
     return 0;
 }
