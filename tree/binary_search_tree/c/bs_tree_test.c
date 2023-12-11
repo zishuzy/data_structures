@@ -19,9 +19,9 @@
 
 #include "bs_tree.h"
 
-void print_node_data(void *key, uint32_t key_len, void *val, uint32_t val_len)
+void print_node_data(bstree_node_t *node)
 {
-    printf("%ld-%ld", (long)key, (long)val);
+    printf("%ld", (long)node->key);
 }
 
 int less(bstree_node_t *left, bstree_node_t *right)
@@ -44,7 +44,7 @@ int main(void)
             root = bstree_node_create((void *)tmp, 0, (void *)tmp, 0);
         } else {
             node = bstree_node_create((void *)tmp, 0, (void *)tmp, 0);
-            bstree_insert_node(root, node, less);
+            bstree_insert(root, node, less);
         }
     }
 
@@ -52,7 +52,7 @@ int main(void)
     bstree_print(root, print_node_data);
 
     node = bstree_node_create(root->key, root->key_len, root->val, root->val_len);
-    bstree_insert_node2(root, node, &old, less);
+    bstree_insert2(root, node, &old, less);
     if (old) {
         LOG_INFO("Found node is exist! old[0x%08lx] data[%ld]", (long)old, (long)old->val);
 

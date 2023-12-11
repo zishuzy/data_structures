@@ -17,8 +17,7 @@
 #include "bs_tree.h"
 
 static void bstree_print_helper(bstree_node_t *node, int depth, int *arr_flag,
-                                void (*cb_print)(void *key, uint32_t key_len, void *val,
-                                                 uint32_t val_len))
+                                void (*cb_print)(bstree_node_t *node))
 {
     int i;
 
@@ -33,7 +32,7 @@ static void bstree_print_helper(bstree_node_t *node, int depth, int *arr_flag,
         printf("(null)\n");
         return;
     }
-    cb_print(node->key, node->key_len, node->val, node->val_len);
+    cb_print(node);
     printf("\n");
     // printf("%s\n", (char *)node->data);
 
@@ -85,6 +84,75 @@ void bstree_destroy(bstree_node_t *root,
     bstree_destroy(root->left, cb, ctx);
     bstree_destroy(root->right, cb, ctx);
     bstree_node_free(root, cb, ctx);
+}
+
+int bstree_insert(bstree_node_t *root, bstree_node_t *node,
+                  int (*less)(bstree_node_t *left, bstree_node_t *right))
+{
+    int rc = 0;
+    if (!root) {
+        return -1;
+    }
+    if (less(node, root)) {
+        if (!root->left) {
+            root->left = node;
+            node->parent = root->left;
+        } else {
+            rc = bstree_insert(root->left, node, less);
+        }
+    } else if (less(root, node)) {
+        if (!root->right) {
+            root->right = node;
+            node->parent = root->right;
+        } else {
+            rc = bstree_insert(root->right, node, less);
+        }
+    } else {
+        rc = -1;
+    }
+
+    return rc;
+}
+
+int bstree_insert2(bstree_node_t *root, bstree_node_t *node, bstree_node_t **old,
+                   int (*less)(bstree_node_t *left, bstree_node_t *right))
+{
+    int rc = 0;
+    if (!root) {
+        return -1;
+    }
+    if (less(node, root)) {
+        if (!root->left) {
+            root->left = node;
+            node->parent = root->left;
+        } else {
+            rc = bstree_insert2(root->left, node, old, less);
+        }
+    } else if (less(root, node)) {
+        if (!root->right) {
+            root->right = node;
+            node->parent = root->right;
+        } else {
+            rc = bstree_insert2(root->right, node, old, less);
+        }
+    } else {
+        if (root->parent) {
+            if (root->parent->left == root) {
+                root->parent->left = node;
+            } else if (root->parent->right == node) {
+                root->parent->right = node;
+            }
+        }
+
+        node->left = root->left;
+        node->right = root->right;
+
+        if (old) {
+            *old = root;
+        }
+    }
+
+    return rc;
 }
 
 int bstree_insert(bstree_node_t *root, void *key, uint32_t key_len, void *val, uint32_t val_len,
@@ -185,18 +253,18 @@ int bstree_insert2(
 }
 
 int bstree_is_exists(bstree_node_t *root, void *key, uint32_t key_len,
-                     int (*less)(void *left_key, uint32_t left_key_len, void *right_key,
-                                 uint32_t right_key_len))
+                     int (*less)(bstree_node_t *left, bstree_node_t *right))
 {
     int rc = 0;
+    bstree_node_t *node;
     if (!root) {
         return rc;
     }
 
-    if (less(key, key_len, root->key, root->key_len)) {
-        rc = bstree_is_exists(root->left, key, key_len, less);
-    } else if (less(root->key, root->key_len, key, key_len)) {
-        rc = bstree_is_exists(root->right, key, key_len, less);
+    if (less(node, root)) {
+        rc = bstree_is_exists(root->left, node, less);
+    } else if (less(root, node)) {
+        rc = bstree_is_exists(root->right, node, less);
     } else { // node == root
         rc = 1;
     }
@@ -369,8 +437,7 @@ void bstree_levelorder2(bstree_node_t *root, int (*cb)(bstree_node_t *node, int 
     queue_free(q2, NULL, NULL);
 }
 
-void bstree_print(bstree_node_t *root,
-                  void (*cb_print)(void *key, uint32_t key_len, void *val, uint32_t val_len))
+void bstree_print(bstree_node_t *root, void (*cb_print)(bstree_node_t *node))
 {
     int *arr_flag = NULL;
     uint32_t depth = bstree_depth(root);
