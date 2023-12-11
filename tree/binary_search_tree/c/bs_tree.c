@@ -155,100 +155,21 @@ int bstree_insert2(bstree_node_t *root, bstree_node_t *node, bstree_node_t **old
     return rc;
 }
 
-int bstree_insert(bstree_node_t *root, void *key, uint32_t key_len, void *val, uint32_t val_len,
-                  int (*less)(void *left_key, uint32_t left_key_len, void *right_key,
-                              uint32_t right_key_len))
+int bstree_node_is_exists(bstree_node_t *root, bstree_node_t *node,
+                          int (*less)(bstree_node_t *left, bstree_node_t *right))
 {
     int rc = 0;
-    if (!root) {
-        return -1;
+    if (!root || !node) {
+        return rc;
     }
 
-    if (less(key, key_len, root->key, root->key_len)) {
-        if (!root->left) {
-            bstree_node_t *node = bstree_node_create(key, key_len, val, val_len);
-            if (!node) {
-                return -1;
-            }
-
-            root->left = node;
-            node->parent = root;
-        } else {
-            rc = bstree_insert(root->left, key, key_len, val, val_len, less);
-        }
-    } else if (less(root->key, root->key_len, key, key_len)) {
-        if (!root->right) {
-            bstree_node_t *node = bstree_node_create(key, key_len, val, val_len);
-            if (!node) {
-                return -1;
-            }
-
-            root->right = node;
-            node->parent = root;
-        } else {
-            rc = bstree_insert(root->right, key, key_len, val, val_len, less);
-        }
+    if (less(node, root)) {
+        rc = bstree_node_is_exists(root->left, node, less);
+    } else if (less(root, node)) {
+        rc = bstree_node_is_exists(root->right, node, less);
     } else { // node == root
-        rc = -1;
+        rc = 1;
     }
-
-    return rc;
-}
-
-int bstree_insert2(
-    bstree_node_t *root, void *key, uint32_t key_len, void *val, uint32_t val_len,
-    int (*less)(void *left_key, uint32_t left_key_len, void *right_key, uint32_t right_key_len),
-    void (*cb_free)(void *key, uint32_t key_len, void *val, uint32_t val_len, void *ctx), void *ctx)
-{
-    int rc = 0;
-    if (!root) {
-        return -1;
-    }
-
-    if (less(key, key_len, root->key, root->key_len)) {
-        if (!root->left) {
-            bstree_node_t *node = bstree_node_create(key, key_len, val, val_len);
-            if (!node) {
-                return -1;
-            }
-
-            root->left = node;
-            node->parent = root;
-        } else {
-            rc = bstree_insert(root->left, key, key_len, val, val_len, less);
-        }
-    } else if (less(root->key, root->key_len, key, key_len)) {
-        if (!root->right) {
-            bstree_node_t *node = bstree_node_create(key, key_len, val, val_len);
-            if (!node) {
-                return -1;
-            }
-
-            root->right = node;
-            node->parent = root;
-        } else {
-            rc = bstree_insert(root->right, key, key_len, val, val_len, less);
-        }
-    } else { // node == root
-        void *key;
-        uint32_t key_len;
-        void *val;
-        uint32_t val_len;
-
-        key = root->key;
-        key_len = root->key_len;
-        val = root->val;
-        val_len = root->val_len;
-
-        root->key = key;
-        root->key_len = key_len;
-        root->val = val;
-        root->val_len = val_len;
-        if (cb_free) {
-            cb_free(key, key_len, val, val_len, ctx);
-        }
-    }
-
     return rc;
 }
 
@@ -261,14 +182,55 @@ int bstree_is_exists(bstree_node_t *root, void *key, uint32_t key_len,
         return rc;
     }
 
-    if (less(node, root)) {
-        rc = bstree_is_exists(root->left, node, less);
-    } else if (less(root, node)) {
-        rc = bstree_is_exists(root->right, node, less);
-    } else { // node == root
-        rc = 1;
+    node = bstree_node_create(key, key_len, NULL, 0);
+    if (!node) {
+        return rc;
     }
+
+    rc = bstree_node_is_exists(root, node, less);
+
+    bstree_node_free(node, NULL, NULL);
+
     return rc;
+}
+
+bstree_node_t *bstree_node_find(bstree_node_t *root, bstree_node_t *node,
+                                int (*less)(bstree_node_t *left, bstree_node_t *right))
+{
+    bstree_node_t *fnode = NULL;
+    if (!root || !node) {
+        return NULL;
+    }
+    if (less(node, root)) {
+        fnode = bstree_node_find(root->left, node, less);
+    } else if (less(root, node)) {
+        fnode = bstree_node_find(root->right, node, less);
+    } else { // node == root
+        fnode = root;
+    }
+
+    return fnode;
+}
+
+bstree_node_t *bstree_find(bstree_node_t *root, void *key, uint32_t key_len,
+                           int (*less)(bstree_node_t *left, bstree_node_t *right))
+{
+    bstree_node_t *node = NULL;
+    bstree_node_t *fnode = NULL;
+    if (!root) {
+        return NULL;
+    }
+
+    node = bstree_node_create(key, key_len, NULL, 0);
+    if (!node) {
+        return NULL;
+    }
+
+    fnode = bstree_node_find(root, node, less);
+
+    bstree_node_free(node, NULL, NULL);
+
+    return fnode;
 }
 
 uint32_t bstree_depth(bstree_node_t *root)

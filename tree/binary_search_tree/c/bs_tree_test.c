@@ -34,6 +34,7 @@ int main(void)
     long i, tmp;
     bstree_node_t *root = NULL;
     bstree_node_t *node, *old = NULL;
+    int result;
 
     srand((int)time(NULL));
     for (i = 0; i < 10; i++) {
@@ -65,6 +66,18 @@ int main(void)
 
     printf("tree print:\n");
     bstree_print(root, print_node_data);
+
+    result = bstree_is_exists(root, (void *)tmp, 0, less);
+    LOG_INFO("find key[%ld], result[%d]", tmp, result);
+
+    result = bstree_is_exists(root, (void *)(tmp + 1), 0, less);
+    LOG_INFO("find key[%ld], result[%d]", (tmp + 1), result);
+
+    node = bstree_find(root, (void *)tmp, 0, less);
+    LOG_INFO("find node key[%ld], node[0x%08lx]", tmp, (long)node);
+
+    node = bstree_find(root, (void *)(tmp + 1), 0, less);
+    LOG_INFO("find node key[%ld], node[0x%08lx]", (tmp + 1), (long)node);
 
     bstree_destroy(root, NULL, NULL);
 
