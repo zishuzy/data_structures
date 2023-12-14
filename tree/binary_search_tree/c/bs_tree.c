@@ -17,7 +17,7 @@
 #include "bs_tree.h"
 
 static void bstree_print_helper(bstree_node_t *node, int depth, int *arr_flag,
-                                void (*cb_print)(bstree_node_t *node))
+                                void (*cb_print)(bstree_node_t *node, void *ctx), void *ctx)
 {
     int i;
 
@@ -32,14 +32,14 @@ static void bstree_print_helper(bstree_node_t *node, int depth, int *arr_flag,
         printf("(null)\n");
         return;
     }
-    cb_print(node);
+    cb_print(node, ctx);
     printf("\n");
     // printf("%s\n", (char *)node->data);
 
     arr_flag[depth] = 1;
-    bstree_print_helper(node->right, depth + 1, arr_flag, cb_print);
+    bstree_print_helper(node->right, depth + 1, arr_flag, cb_print, ctx);
     arr_flag[depth] = 0;
-    bstree_print_helper(node->left, depth + 1, arr_flag, cb_print);
+    bstree_print_helper(node->left, depth + 1, arr_flag, cb_print, ctx);
 }
 
 bstree_node_t *bstree_node_create(void *key, uint32_t key_len, void *val, uint32_t val_len)
@@ -86,149 +86,81 @@ void bstree_destroy(bstree_node_t *root,
     bstree_node_free(root, cb, ctx);
 }
 
-int bstree_insert(bstree_node_t *root, bstree_node_t *node,
-                  int (*less)(bstree_node_t *left, bstree_node_t *right))
+bstree_node_t *
+bstree_insert(bstree_node_t *root, void *key, uint32_t key_len, void *val, uint32_t val_len,
+              int (*less)(void *left_key, uint32_t left_len, void *right_key, uint32_t right_len))
+{
+    if (!root) {
+        return bstree_node_create(key, key_len, val, val_len);
+    }
+    if (less(key, key_len, root->key, root->key_len)) {
+        root->left = bstree_insert(root->left, key, key_len, val, val_len, less);
+    } else if (less(root->key, root->key_len, key, key_len)) {
+        root->right = bstree_insert(root->right, key, key_len, val, val_len, less);
+    }
+
+    return root;
+}
+
+bstree_node_t *
+bstree_insert2(bstree_node_t *root, void *key, uint32_t key_len, void *val, uint32_t val_len,
+               int (*less)(void *left_key, uint32_t left_len, void *right_key, uint32_t right_len),
+               int (*cb)(void *key, uint32_t key_len, void *val, uint32_t val_len, void *ctx),
+               void *ctx)
+{
+    if (!root) {
+        return bstree_node_create(key, key_len, val, val_len);
+    }
+    if (less(key, key_len, root->key, root->key_len)) {
+        root->left = bstree_insert(root->left, key, key_len, val, val_len, less);
+    } else if (less(root->key, root->key_len, key, key_len)) {
+        root->right = bstree_insert(root->right, key, key_len, val, val_len, less);
+    } else {
+        if (cb(root->key, root->key_len, root->val, root->val_len, ctx)) {
+            root->key = key;
+            root->key_len = key_len;
+            root->val = val;
+            root->val_len = val_len;
+        }
+    }
+
+    return root;
+}
+
+int bstree_is_exists(bstree_node_t *root, void *key, uint32_t key_len,
+                     int (*less)(void *left_key, uint32_t left_len, void *right_key,
+                                 uint32_t right_len))
 {
     int rc = 0;
     if (!root) {
-        return -1;
-    }
-    if (less(node, root)) {
-        if (!root->left) {
-            root->left = node;
-            node->parent = root->left;
-        } else {
-            rc = bstree_insert(root->left, node, less);
-        }
-    } else if (less(root, node)) {
-        if (!root->right) {
-            root->right = node;
-            node->parent = root->right;
-        } else {
-            rc = bstree_insert(root->right, node, less);
-        }
-    } else {
-        rc = -1;
-    }
-
-    return rc;
-}
-
-int bstree_insert2(bstree_node_t *root, bstree_node_t *node, bstree_node_t **old,
-                   int (*less)(bstree_node_t *left, bstree_node_t *right))
-{
-    int rc = 0;
-    if (!root) {
-        return -1;
-    }
-    if (less(node, root)) {
-        if (!root->left) {
-            root->left = node;
-            node->parent = root->left;
-        } else {
-            rc = bstree_insert2(root->left, node, old, less);
-        }
-    } else if (less(root, node)) {
-        if (!root->right) {
-            root->right = node;
-            node->parent = root->right;
-        } else {
-            rc = bstree_insert2(root->right, node, old, less);
-        }
-    } else {
-        if (root->parent) {
-            if (root->parent->left == root) {
-                root->parent->left = node;
-            } else if (root->parent->right == node) {
-                root->parent->right = node;
-            }
-        }
-
-        node->left = root->left;
-        node->right = root->right;
-
-        if (old) {
-            *old = root;
-        }
-    }
-
-    return rc;
-}
-
-int bstree_node_is_exists(bstree_node_t *root, bstree_node_t *node,
-                          int (*less)(bstree_node_t *left, bstree_node_t *right))
-{
-    int rc = 0;
-    if (!root || !node) {
         return rc;
     }
 
-    if (less(node, root)) {
-        rc = bstree_node_is_exists(root->left, node, less);
-    } else if (less(root, node)) {
-        rc = bstree_node_is_exists(root->right, node, less);
+    if (less(key, key_len, root->key, root->key_len)) {
+        rc = bstree_is_exists(root->left, key, key_len, less);
+    } else if (less(root->key, root->key_len, key, key_len)) {
+        rc = bstree_is_exists(root->right, key, key_len, less);
     } else { // node == root
         rc = 1;
     }
     return rc;
 }
 
-int bstree_is_exists(bstree_node_t *root, void *key, uint32_t key_len,
-                     int (*less)(bstree_node_t *left, bstree_node_t *right))
-{
-    int rc = 0;
-    bstree_node_t *node;
-    if (!root) {
-        return rc;
-    }
-
-    node = bstree_node_create(key, key_len, NULL, 0);
-    if (!node) {
-        return rc;
-    }
-
-    rc = bstree_node_is_exists(root, node, less);
-
-    bstree_node_free(node, NULL, NULL);
-
-    return rc;
-}
-
-bstree_node_t *bstree_node_find(bstree_node_t *root, bstree_node_t *node,
-                                int (*less)(bstree_node_t *left, bstree_node_t *right))
+bstree_node_t *bstree_find(bstree_node_t *root, void *key, uint32_t key_len,
+                           int (*less)(void *left_key, uint32_t left_len, void *right_key,
+                                       uint32_t right_len))
 {
     bstree_node_t *fnode = NULL;
-    if (!root || !node) {
+    if (!root) {
         return NULL;
     }
-    if (less(node, root)) {
-        fnode = bstree_node_find(root->left, node, less);
-    } else if (less(root, node)) {
-        fnode = bstree_node_find(root->right, node, less);
+    if (less(key, key_len, root->key, root->key_len)) {
+        fnode = bstree_find(root->left, key, key_len, less);
+    } else if (less(root->key, root->key_len, key, key_len)) {
+        fnode = bstree_find(root->right, key, key_len, less);
     } else { // node == root
         fnode = root;
     }
-
-    return fnode;
-}
-
-bstree_node_t *bstree_find(bstree_node_t *root, void *key, uint32_t key_len,
-                           int (*less)(bstree_node_t *left, bstree_node_t *right))
-{
-    bstree_node_t *node = NULL;
-    bstree_node_t *fnode = NULL;
-    if (!root) {
-        return NULL;
-    }
-
-    node = bstree_node_create(key, key_len, NULL, 0);
-    if (!node) {
-        return NULL;
-    }
-
-    fnode = bstree_node_find(root, node, less);
-
-    bstree_node_free(node, NULL, NULL);
 
     return fnode;
 }
@@ -399,7 +331,7 @@ void bstree_levelorder2(bstree_node_t *root, int (*cb)(bstree_node_t *node, int 
     queue_free(q2, NULL, NULL);
 }
 
-void bstree_print(bstree_node_t *root, void (*cb_print)(bstree_node_t *node))
+void bstree_print(bstree_node_t *root, void (*cb_print)(bstree_node_t *node, void *ctx), void *ctx)
 {
     int *arr_flag = NULL;
     uint32_t depth = bstree_depth(root);
@@ -412,7 +344,7 @@ void bstree_print(bstree_node_t *root, void (*cb_print)(bstree_node_t *node))
         return;
     }
     arr_flag[0] = 1;
-    bstree_print_helper(root, 0, arr_flag, cb_print);
+    bstree_print_helper(root, 0, arr_flag, cb_print, ctx);
 
     free(arr_flag);
 }

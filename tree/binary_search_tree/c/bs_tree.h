@@ -56,69 +56,50 @@ void bstree_destroy(bstree_node_t *root,
  * @param root
  * @param node
  * @param less
- * @return int On success, 0 is retuned. On error, -1 is returned.
+ * @return int On success, the node is retuned. On error, NULL is returned.
  */
-int bstree_insert(bstree_node_t *root, bstree_node_t *node,
-                  int (*less)(bstree_node_t *left, bstree_node_t *right));
+bstree_node_t *
+bstree_insert(bstree_node_t *root, void *key, uint32_t key_len, void *val, uint32_t val_len,
+              int (*less)(void *left_key, uint32_t left_len, void *right_key, uint32_t right_len));
 
 /**
- * @brief Insert the node of a binary search tree, if the node exists, the "old" will be set to the
- * old node.
+ * @brief Insert the node of a binary search tree, if the node exists, the "cb" will be call.
  *
  * @param root
  * @param node
  * @param old
  * @param less
- * @return int On success, 0 is retuned. On error, -1 is returned.
+ * @return int On success, the node is retuned. On error, NULL is returned.
  */
-int bstree_insert2(bstree_node_t *root, bstree_node_t *node, bstree_node_t **old,
-                   int (*less)(bstree_node_t *left, bstree_node_t *right));
+bstree_node_t *
+bstree_insert2(bstree_node_t *root, void *key, uint32_t key_len, void *val, uint32_t val_len,
+               int (*less)(void *left_key, uint32_t left_len, void *right_key, uint32_t right_len),
+               int (*cb)(void *key, uint32_t key_len, void *val, uint32_t val_len, void *ctx),
+               void *ctx);
 
 /**
  * @brief Check if the node exists in the binary search tree.
- * 
- * @param root 
- * @param node 
- * @param less 
- * @return int On exists, 1 is returned. On not exists, 0 is returned.
- */
-int bstree_node_is_exists(bstree_node_t *root, bstree_node_t *node,
-                          int (*less)(bstree_node_t *left, bstree_node_t *right));
-
-/**
- * @brief Check if the key exists in the binary search tree.
- * 
- * @param root 
- * @param key 
- * @param key_len 
- * @param less 
+ *
+ * @param root
+ * @param node
+ * @param less
  * @return int On exists, 1 is returned. On not exists, 0 is returned.
  */
 int bstree_is_exists(bstree_node_t *root, void *key, uint32_t key_len,
-                     int (*less)(bstree_node_t *left, bstree_node_t *right));
+                     int (*less)(void *left_key, uint32_t left_len, void *right_key,
+                                 uint32_t right_len));
 
 /**
  * @brief Find the node in the binary search tree.
- * 
- * @param root 
- * @param node 
- * @param less 
- * @return bstree_node_t* On success, the node is returned. On error, NULL is returned.
- */
-bstree_node_t *bstree_node_find(bstree_node_t *root, bstree_node_t *node,
-                                int (*less)(bstree_node_t *left, bstree_node_t *right));
-
-/**
- * @brief Find the node with the key in the binary search tree.
- * 
- * @param root 
- * @param key 
- * @param key_len 
- * @param less 
+ *
+ * @param root
+ * @param node
+ * @param less
  * @return bstree_node_t* On success, the node is returned. On error, NULL is returned.
  */
 bstree_node_t *bstree_find(bstree_node_t *root, void *key, uint32_t key_len,
-                           int (*less)(bstree_node_t *left, bstree_node_t *right));
+                           int (*less)(void *left_key, uint32_t left_len, void *right_key,
+                                       uint32_t right_len));
 
 /**
  * @brief Get the depth for the binary search tree.
@@ -179,7 +160,8 @@ void bstree_levelorder2(bstree_node_t *root, int (*cb)(bstree_node_t *node, int 
  *
  * @param root
  * @param cb_print
+ * @param ctx
  */
-void bstree_print(bstree_node_t *root, void (*cb_print)(bstree_node_t *node));
+void bstree_print(bstree_node_t *root, void (*cb_print)(bstree_node_t *node, void *ctx), void *ctx);
 
 #endif /* C_BS_TREE */

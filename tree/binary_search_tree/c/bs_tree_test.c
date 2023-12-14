@@ -19,14 +19,20 @@
 
 #include "bs_tree.h"
 
-void print_node_data(bstree_node_t *node)
+void print_node_data(bstree_node_t *node, void *ctx)
 {
     printf("%ld", (long)node->key);
 }
 
-int less(bstree_node_t *left, bstree_node_t *right)
+int less(void *left_key, uint32_t left_len, void *right_key, uint32_t right_len)
 {
-    return (long)left->key < (long)right->key;
+    return (long)left_key < (long)right_key;
+}
+
+int cb_free(void *key, uint32_t key_len, void *val, uint32_t val_len, void *ctx)
+{
+    LOG_INFO("Found node is exist!, key[%ld]", (long)key);
+    return 1;
 }
 
 int main(void)
@@ -42,30 +48,19 @@ int main(void)
         LOG_INFO("Insert val: %ld", tmp);
 
         if (!root) {
-            root = bstree_node_create((void *)tmp, 0, (void *)tmp, 0);
+            root = bstree_insert(root, (void *)tmp, 0, NULL, 0, less);
         } else {
-            node = bstree_node_create((void *)tmp, 0, (void *)tmp, 0);
-            bstree_insert(root, node, less);
+            bstree_insert(root, (void *)tmp, 0, NULL, 0, less);
         }
     }
 
     printf("tree print:\n");
-    bstree_print(root, print_node_data);
+    bstree_print(root, print_node_data, NULL);
 
-    node = bstree_node_create(root->key, root->key_len, root->val, root->val_len);
-    bstree_insert2(root, node, &old, less);
-    if (old) {
-        LOG_INFO("Found node is exist! old[0x%08lx] data[%ld]", (long)old, (long)old->val);
-
-        if (old == root) {
-            LOG_INFO("Insert node is root! root[0x%08lx] old[0x%08lx]", (long)root, (long)old);
-            root = node;
-        }
-        bstree_node_free(old, NULL, NULL);
-    }
+    bstree_insert2(root, root->key, root->key_len, root->val, root->val_len, less, cb_free, NULL);
 
     printf("tree print:\n");
-    bstree_print(root, print_node_data);
+    bstree_print(root, print_node_data, NULL);
 
     result = bstree_is_exists(root, (void *)tmp, 0, less);
     LOG_INFO("find key[%ld], result[%d]", tmp, result);
