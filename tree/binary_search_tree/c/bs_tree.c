@@ -90,13 +90,22 @@ bstree_node_t *
 bstree_insert(bstree_node_t *root, void *key, uint32_t key_len, void *val, uint32_t val_len,
               int (*less)(void *left_key, uint32_t left_len, void *right_key, uint32_t right_len))
 {
+    bstree_node_t *node;
     if (!root) {
         return bstree_node_create(key, key_len, val, val_len);
     }
     if (less(key, key_len, root->key, root->key_len)) {
-        root->left = bstree_insert(root->left, key, key_len, val, val_len, less);
+        node = bstree_insert(root->left, key, key_len, val, val_len, less);
+        if (node) {
+            root->left = node;
+        }
     } else if (less(root->key, root->key_len, key, key_len)) {
-        root->right = bstree_insert(root->right, key, key_len, val, val_len, less);
+        node = bstree_insert(root->right, key, key_len, val, val_len, less);
+        if (node) {
+            root->right = node;
+        }
+    } else {
+        root = NULL;
     }
 
     return root;
@@ -112,9 +121,9 @@ bstree_insert2(bstree_node_t *root, void *key, uint32_t key_len, void *val, uint
         return bstree_node_create(key, key_len, val, val_len);
     }
     if (less(key, key_len, root->key, root->key_len)) {
-        root->left = bstree_insert(root->left, key, key_len, val, val_len, less);
+        root->left = bstree_insert2(root->left, key, key_len, val, val_len, less, cb, ctx);
     } else if (less(root->key, root->key_len, key, key_len)) {
-        root->right = bstree_insert(root->right, key, key_len, val, val_len, less);
+        root->right = bstree_insert2(root->right, key, key_len, val, val_len, less, cb, ctx);
     } else {
         if (cb(root->key, root->key_len, root->val, root->val_len, ctx)) {
             root->key = key;

@@ -51,10 +51,13 @@ void bstree_destroy(bstree_node_t *root,
                     void *ctx);
 
 /**
- * @brief Insert the node of a binary search tree, if the node exists, return -1.
+ * @brief Insert the node of a binary search tree, if the node exists, return NULL.
  *
  * @param root
- * @param node
+ * @param key
+ * @param key_len
+ * @param val
+ * @param val_len
  * @param less
  * @return int On success, the node is retuned. On error, NULL is returned.
  */
@@ -66,9 +69,14 @@ bstree_insert(bstree_node_t *root, void *key, uint32_t key_len, void *val, uint3
  * @brief Insert the node of a binary search tree, if the node exists, the "cb" will be call.
  *
  * @param root
- * @param node
- * @param old
+ * @param key
+ * @param key_len
+ * @param val
+ * @param val_len
  * @param less
+ * @param cb    If the function returns non-zero, it indicates that the old value will be
+ *              replaced; otherwise, it indicates that the old value will not be replaced.
+ * @param ctx
  * @return int On success, the node is retuned. On error, NULL is returned.
  */
 bstree_node_t *
@@ -81,7 +89,8 @@ bstree_insert2(bstree_node_t *root, void *key, uint32_t key_len, void *val, uint
  * @brief Check if the node exists in the binary search tree.
  *
  * @param root
- * @param node
+ * @param key
+ * @param key_len
  * @param less
  * @return int On exists, 1 is returned. On not exists, 0 is returned.
  */
@@ -93,7 +102,8 @@ int bstree_is_exists(bstree_node_t *root, void *key, uint32_t key_len,
  * @brief Find the node in the binary search tree.
  *
  * @param root
- * @param node
+ * @param key
+ * @param key_len
  * @param less
  * @return bstree_node_t* On success, the node is returned. On error, NULL is returned.
  */

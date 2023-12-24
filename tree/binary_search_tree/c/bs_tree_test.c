@@ -39,7 +39,7 @@ int main(void)
 {
     long i, tmp;
     bstree_node_t *root = NULL;
-    bstree_node_t *node, *old = NULL;
+    bstree_node_t *node;
     int result;
 
     srand((int)time(NULL));
@@ -50,7 +50,8 @@ int main(void)
         if (!root) {
             root = bstree_insert(root, (void *)tmp, 0, NULL, 0, less);
         } else {
-            bstree_insert(root, (void *)tmp, 0, NULL, 0, less);
+            node = bstree_insert(root, (void *)tmp, 0, NULL, 0, less);
+            printf("node: 0x%08lx, key[%ld]\n", (long)node, (long)node->key);
         }
     }
 
@@ -58,6 +59,12 @@ int main(void)
     bstree_print(root, print_node_data, NULL);
 
     bstree_insert2(root, root->key, root->key_len, root->val, root->val_len, less, cb_free, NULL);
+
+    printf("tree print:\n");
+    bstree_print(root, print_node_data, NULL);
+
+    LOG_INFO("Insert node: key[%ld]", (long)tmp);
+    bstree_insert2(root, (void *)tmp, 0, NULL, 0, less, cb_free, NULL);
 
     printf("tree print:\n");
     bstree_print(root, print_node_data, NULL);
