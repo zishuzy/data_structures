@@ -12,6 +12,10 @@ The project contains implementions of commonly used data structures.
 │   └── singly_linked
 ├── queue
 └── tree
+    ├── binary_tree
+    ├── binary_search_tree
+    └── avl_tree
+
 ```
 
 ## 平衡二叉树

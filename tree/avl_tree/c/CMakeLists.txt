@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(avl_tree)
+project(avl_tree_c)
 
 if(NOT DEFINED CMAKE_C_STANDARD)
     message("Set CMAKE_C_STANDARD as 11")
@@ -21,6 +21,15 @@ endif()
 include_directories(${PROJECT_SOURCE_DIR}
     ${PROJECT_SOURCE_DIR}/..
     ${PROJECT_SOURCE_DIR}/../..
+    ${PROJECT_SOURCE_DIR}/../../..
 )
 
-add_subdirectory(c)
+add_executable(
+    avl_tree_c
+
+    avl_tree_test.c
+    avl_tree.c
+
+    ${PROJECT_SOURCE_DIR}/../../../queue/c/queue.c
+    ${PROJECT_SOURCE_DIR}/../../../common/utils/utils_string.c
+)
