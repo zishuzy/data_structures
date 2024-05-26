@@ -4,9 +4,9 @@
  * @brief Test singly-linked list using C.
  * @version 0.1
  * @date 2023-12-07
- * 
+ *
  * @copyright Copyright (c) 2023
- * 
+ *
  */
 #include "common/log/log.h"
 
@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
             LOG_ERROR("Failed to create node! i[%ld]", i);
             continue;
         }
-        slist_insert_node_end(head, node);
+        slist_insert_node_in_end(head, node);
     }
 
     LOG_INFO("Forward traverse:");
@@ -107,19 +107,19 @@ int main(int argc, char *argv[])
     slist_forward_traverse(head, print_node, NULL);
 
     LOG_INFO("Move node to start! node->data[%ld]", (long)fe_ctx.node->data);
-    slist_move_node_start(head, fe_ctx.node);
+    slist_move_node_to_start(head, fe_ctx.node);
 
     LOG_INFO("Forward traverse:");
     slist_forward_traverse(head, print_node, NULL);
 
     LOG_INFO("Move node to end! node->data[%ld]", (long)fe_ctx.node->data);
-    slist_move_node_end(head, fe_ctx.node);
+    slist_move_node_to_end(head, fe_ctx.node);
 
     LOG_INFO("Forward traverse:");
     slist_forward_traverse(head, print_node, NULL);
 
     LOG_INFO("Move node to start! node->data[%ld]", (long)fe_ctx.node->data);
-    slist_move_node_start(head, fe_ctx.node);
+    slist_move_node_to_start(head, fe_ctx.node);
 
     LOG_INFO("Forward traverse:");
     slist_forward_traverse(head, print_node, NULL);

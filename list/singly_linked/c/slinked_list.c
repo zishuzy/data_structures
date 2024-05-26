@@ -58,15 +58,19 @@ struct slinked_list_node *slist_node_create(void *data)
     return node;
 }
 
-void slist_node_free(struct slinked_list_node *node)
+void *slist_node_free(struct slinked_list_node *node)
 {
+    void *data = NULL;
     if (!node) {
-        return;
+        return data;
     }
+
+    data = node->data;
     free(node);
+    return data;
 }
 
-int slist_insert_node_start(struct slinked_list_head *head, struct slinked_list_node *node)
+int slist_insert_node_in_start(struct slinked_list_head *head, struct slinked_list_node *node)
 {
     if (!head || !node) {
         return -1;
@@ -86,7 +90,7 @@ int slist_insert_node_start(struct slinked_list_head *head, struct slinked_list_
     return 0;
 }
 
-int slist_insert_node_end(struct slinked_list_head *head, struct slinked_list_node *node)
+int slist_insert_node_in_end(struct slinked_list_head *head, struct slinked_list_node *node)
 {
     if (!head || !node) {
         return -1;
@@ -149,6 +153,26 @@ int slist_insert_node_after(struct slinked_list_head *head, struct slinked_list_
     return 0;
 }
 
+struct slinked_list_node *slist_find_node(struct slinked_list_head *head, void *data,
+                                          int (*equal)(void *a, void *b))
+{
+    int found = 0;
+    struct slinked_list_node *node = NULL;
+
+    if (!head || !equal) {
+        return NULL;
+    }
+
+    for (node = head->first; node != NULL; node = node->next) {
+        if (equal(node->data, data) == 0) {
+            found = 1;
+            break;
+        }
+    }
+
+    return found ? node : NULL;
+}
+
 struct slinked_list_node *slist_find_node_prev(struct slinked_list_head *head,
                                                struct slinked_list_node *node)
 {
@@ -168,7 +192,7 @@ struct slinked_list_node *slist_find_node_prev(struct slinked_list_head *head,
     return found ? found_node : NULL;
 }
 
-int slist_move_node_start(struct slinked_list_head *head, struct slinked_list_node *node)
+int slist_move_node_to_start(struct slinked_list_head *head, struct slinked_list_node *node)
 {
     struct slinked_list_node *prev;
 
@@ -198,7 +222,7 @@ int slist_move_node_start(struct slinked_list_head *head, struct slinked_list_no
     return 0;
 }
 
-int slist_move_node_end(struct slinked_list_head *head, struct slinked_list_node *node)
+int slist_move_node_to_end(struct slinked_list_head *head, struct slinked_list_node *node)
 {
     struct slinked_list_node *prev;
 
@@ -238,6 +262,9 @@ struct slinked_list_node *slist_remove_node(struct slinked_list_head *head,
 
     if (head->first == node) {
         head->first = node->next;
+        if (head->last == node) {
+            head->last = node->next;
+        }
     } else {
         prev = slist_find_node_prev(head, node);
         if (!prev) {
