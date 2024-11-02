@@ -18,7 +18,8 @@ if(NOT DEFINED CMAKE_BUILD_TYPE)
     message("Set CMAKE_BUILD_TYPE as Debug")
 endif()
 
-include_directories(${PROJECT_SOURCE_DIR}
+include_directories(
+    ${PROJECT_SOURCE_DIR}
     ${PROJECT_SOURCE_DIR}/..
 )
 
