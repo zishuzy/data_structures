@@ -9,13 +9,14 @@ if(NOT DEFINED CMAKE_C_STANDARD)
 endif()
 
 if(NOT DEFINED CMAKE_CXX_STANDARD)
-    message("Set CMAKE_C_STANDARD as 20")
+    message("Set CMAKE_CXX_STANDARD as 20")
     set(CMAKE_CXX_STANDARD 20)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
 endif()
 
-if(NOT DEFINED CMAKE_BUILD_TYPE)
-    message("Set CMAKE_BUILD_TYPE as Debug")
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type" FORCE)
+    message(STATUS "CMAKE_BUILD_TYPE is not set. Defaulting to Debug.")
 endif()
 
 IF(CMAKE_SYSTEM_NAME MATCHES "Linux")
