@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(slinked_list_c)
+project(heap_c)
 
 if(NOT DEFINED CMAKE_C_STANDARD)
     message("Set CMAKE_C_STANDARD as 11")
@@ -45,7 +45,6 @@ include_directories(
     ${PROJECT_SOURCE_DIR}
     ${PROJECT_SOURCE_DIR}/..
     ${PROJECT_SOURCE_DIR}/../..
-    ${PROJECT_SOURCE_DIR}/../../..
 )
 
 link_directories(
@@ -53,9 +52,6 @@ link_directories(
 )
 
 add_executable(max_heap max_heap.c)
-target_compile_definitions(max_heap PRIVATE __TEST__=2)
+target_compile_definitions(max_heap PRIVATE __TEST__)
 add_executable(heap heap.c)
-target_compile_definitions(heap PRIVATE __TEST__=2)
-
-# add_executable(slinked_list_c_gtest slinked_list_gtest.cpp slinked_list.c)
-# target_link_libraries(slinked_list_c_gtest GTest::GTest GTest::gmock)
+target_compile_definitions(heap PRIVATE __TEST__)

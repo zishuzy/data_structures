@@ -19,9 +19,9 @@ if(NOT CMAKE_BUILD_TYPE)
     message(STATUS "CMAKE_BUILD_TYPE is not set. Defaulting to Debug.")
 endif()
 
-include_directories(${PROJECT_SOURCE_DIR}
+include_directories(
+    ${PROJECT_SOURCE_DIR}
     ${PROJECT_SOURCE_DIR}/..
-    ${PROJECT_SOURCE_DIR}/../..
 )
 
 add_subdirectory(c)
