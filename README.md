@@ -2,21 +2,14 @@
 
 The project contains implementions of commonly used data structures.
 
-## Code tree
+- list: 链表
+    - singly_linked: 单向链表
+    - doubly_linked: 双向链表
+- queue: 队列
+- tree: 树
+- heap: 堆
+- dsu: 并查集
 
-```shell
-.
-├── common
-├── list
-│   ├── doubly_linked
-│   └── singly_linked
-├── queue
-└── tree
-    ├── binary_tree
-    ├── binary_search_tree
-    └── avl_tree
-
-```
 
 ## 平衡二叉树
 
